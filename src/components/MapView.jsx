@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Link } from 'react-router-dom';
-
+import 'leaflet/dist/leaflet.css';
 // Leaflet's default marker icons reference image files that don't resolve
 // correctly under Vite bundling, so we rebuild them from the CDN.
 delete L.Icon.Default.prototype._getIconUrl;
