@@ -1,0 +1,63 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import PulseBadge from './PulseBadge.jsx';
+
+const priceLabel = (level) => '₹'.repeat(level || 1);
+
+const CafeCard = ({ cafe, index = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 24 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: '-40px' }}
+    transition={{ duration: 0.45, delay: Math.min(index * 0.05, 0.3), ease: [0.22, 1, 0.36, 1] }}
+    whileHover={{ y: -6 }}
+    className="group"
+  >
+    <Link
+      to={`/cafe/${cafe._id}`}
+      className="block glass rounded-2xl overflow-hidden shadow-premium hover:shadow-glow transition-shadow duration-300"
+    >
+      <div className="relative h-44 overflow-hidden">
+        <img
+          src={cafe.image}
+          alt={cafe.name}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-transparent" />
+        {cafe.isPremiumPartner && (
+          <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 text-ink-950">
+            PLUS PARTNER
+          </span>
+        )}
+        {typeof cafe.distanceKm === 'number' && (
+          <span className="absolute top-3 right-3 text-[11px] font-semibold px-2.5 py-1 rounded-full glass">
+            {cafe.distanceKm} km
+          </span>
+        )}
+      </div>
+
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-2 mb-1.5">
+          <h3 className="font-display font-semibold text-base leading-tight">{cafe.name}</h3>
+          <div className="flex items-center gap-1 text-xs font-semibold text-gold-400 shrink-0">
+            ★ {cafe.rating?.toFixed(1)}
+          </div>
+        </div>
+        <p className="text-slate-400 text-sm mb-3 line-clamp-2">{cafe.description}</p>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs text-slate-400">
+            <span>{priceLabel(cafe.priceLevel)}</span>
+            <span className="w-1 h-1 rounded-full bg-slate-600" />
+            <span>{cafe.cuisine?.slice(0, 2).join(', ')}</span>
+          </div>
+          <PulseBadge vibeScore={cafe.vibeScore} hasLivePulse={cafe.hasLivePulse} />
+        </div>
+      </div>
+    </Link>
+  </motion.div>
+);
+
+export default CafeCard;
