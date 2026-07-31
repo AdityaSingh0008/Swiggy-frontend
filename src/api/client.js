@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  'https://YOUR_RENDER_URL.onrender.com/api';
+  'https://swiggy-backend-syuv.onrender.com/api';
 
 const client = axios.create({ baseURL: API_URL });
 
