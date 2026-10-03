@@ -115,7 +115,7 @@ const Discover = () => {
         <div className="relative z-10 flex flex-col md:flex-row gap-6 items-center">
           <div className="flex-1">
             <h3 className="text-xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-emerald-400 mb-2">
-              ✨ Ask the AI Concierge
+              🤖 AI-Powered "Find My Café"
             </h3>
             <p className="text-slate-400 text-sm mb-4">
               Describe your vibe. Looking for a quiet place to study? A lively rooftop for dates?
@@ -163,8 +163,8 @@ const Discover = () => {
           </div>
           {aiResponse && (
             <div className="flex-1 bg-[#14151a]/80 p-5 rounded-2xl border border-white/5 text-sm leading-relaxed text-slate-300">
-              <span className="text-emerald-400 font-bold mb-2 block">Concierge says:</span>
-              {aiResponse}
+              <span className="text-emerald-400 font-bold mb-2 block">Recommendations:</span>
+              <div className="whitespace-pre-wrap">{aiResponse}</div>
             </div>
           )}
         </div>
