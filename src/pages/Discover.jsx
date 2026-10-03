@@ -20,6 +20,11 @@ const Discover = () => {
   const [activeTag, setActiveTag] = useState('');
   const [radius, setRadius] = useState(10);
   const [view, setView] = useState('map'); // 'map' | 'list'
+  
+  // AI Concierge state
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResponse, setAiResponse] = useState(null);
 
   const fetchCafes = useCallback(async (loc) => {
     setLoading(true);
@@ -102,6 +107,67 @@ const Discover = () => {
         >
           {locating ? 'Locating…' : '📍 Use my location'}
         </button>
+      </div>
+
+      {/* AI Concierge Section */}
+      <div className="mb-8 p-6 rounded-3xl glass border border-gold-400/20 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row gap-6 items-center">
+          <div className="flex-1">
+            <h3 className="text-xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-emerald-400 mb-2">
+              ✨ Ask the AI Concierge
+            </h3>
+            <p className="text-slate-400 text-sm mb-4">
+              Describe your vibe. Looking for a quiet place to study? A lively rooftop for dates?
+            </p>
+            <form 
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!aiPrompt) return;
+                setAiLoading(true);
+                try {
+                  const res = await client.post('/ai/recommend', {
+                    prompt: aiPrompt,
+                    lat: userLocation?.lat,
+                    lng: userLocation?.lng
+                  });
+                  setAiResponse(res.data.message);
+                  if (res.data.recommendedCafes?.length > 0) {
+                    setCafes(res.data.recommendedCafes);
+                    // Clear other filters
+                    setActiveTag('');
+                    setFilterQuery('');
+                  }
+                } catch (err) {
+                  setAiResponse("Sorry, I couldn't connect to the AI brain right now.");
+                } finally {
+                  setAiLoading(false);
+                }
+              }}
+              className="flex gap-3"
+            >
+              <input
+                value={aiPrompt}
+                onChange={e => setAiPrompt(e.target.value)}
+                placeholder="e.g. 'A quiet cozy place with fast wifi for a meeting'"
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-400/50 transition-colors"
+              />
+              <button 
+                type="submit" 
+                disabled={aiLoading}
+                className="px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-400 text-ink-950 hover:shadow-glow transition-all disabled:opacity-50"
+              >
+                {aiLoading ? 'Thinking...' : 'Recommend'}
+              </button>
+            </form>
+          </div>
+          {aiResponse && (
+            <div className="flex-1 bg-[#14151a]/80 p-5 rounded-2xl border border-white/5 text-sm leading-relaxed text-slate-300">
+              <span className="text-emerald-400 font-bold mb-2 block">Concierge says:</span>
+              {aiResponse}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col md:flex-row gap-3 mb-6">
