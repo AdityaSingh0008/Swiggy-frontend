@@ -15,8 +15,8 @@ const Discover = () => {
   const [locating, setLocating] = useState(false);
   const [cafes, setCafes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState('');
-  const [locationQuery, setLocationQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [filterQuery, setFilterQuery] = useState('');
   const [activeTag, setActiveTag] = useState('');
   const [radius, setRadius] = useState(10);
   const [view, setView] = useState('map'); // 'map' | 'list'
@@ -30,7 +30,7 @@ const Discover = () => {
         params.set('lng', loc.lng);
         params.set('radius', radius);
       }
-      if (query) params.set('q', query);
+      if (filterQuery) params.set('q', filterQuery);
       if (activeTag) params.set('tag', activeTag);
       const { data } = await client.get(`/cafes?${params.toString()}`);
       setCafes(data.cafes);
@@ -39,7 +39,7 @@ const Discover = () => {
     } finally {
       setLoading(false);
     }
-  }, [query, activeTag, radius]);
+  }, [filterQuery, activeTag, radius]);
 
   const locateMe = () => {
     setLocating(true);
@@ -72,7 +72,7 @@ const Discover = () => {
   useEffect(() => {
     fetchCafes(userLocation);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLocation, query, activeTag, radius]);
+  }, [userLocation, filterQuery, activeTag, radius]);
 
   const handleMapMove = useCallback((newCenter) => {
     setMapCenter(newCenter);
@@ -109,21 +109,37 @@ const Discover = () => {
           className="relative flex-1"
           onSubmit={async (e) => {
             e.preventDefault();
-            if (!locationQuery) return;
+            if (!searchInput) return;
             setLocating(true);
             try {
-              // Geocode the location using free Nominatim API
-              const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationQuery)}`);
+              // Geocode the query to find real-world location (city or specific place)
+              const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}&addressdetails=1`);
               const data = await res.json();
+              
               if (data && data.length > 0) {
-                const { lat, lon, display_name } = data[0];
-                const newLoc = { lat: Number(lat), lng: Number(lon), label: display_name.split(',')[0] };
+                const bestMatch = data[0];
+                const newLoc = { 
+                  lat: Number(bestMatch.lat), 
+                  lng: Number(bestMatch.lon), 
+                  label: bestMatch.name || bestMatch.display_name.split(',')[0] 
+                };
+                
+                // Pan map
                 setUserLocation(newLoc);
-                // Also center map immediately
                 setMapCenter(newLoc);
                 setShowSearchArea(false);
+
+                // If they searched a specific place/cafe, use its name to filter results. 
+                // If they searched a city/area, fetch all cafes there.
+                let filterQ = '';
+                if (['amenity', 'shop', 'leisure', 'tourism'].includes(bestMatch.class)) {
+                  filterQ = bestMatch.name || bestMatch.address?.amenity || bestMatch.address?.shop || searchInput;
+                }
+                
+                // Set the active query to the parsed filter, or empty for cities
+                setFilterQuery(filterQ);
               } else {
-                alert('Location not found. Try another city.');
+                alert('Location not found. Try another city or cafe.');
               }
             } catch (err) {
               console.error(err);
@@ -133,9 +149,9 @@ const Discover = () => {
           }}
         >
           <input
-            value={locationQuery}
-            onChange={(e) => setLocationQuery(e.target.value)}
-            placeholder="Enter city or area (e.g. Sohna)..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Search city, area, cafe, or restaurant (e.g. Starbucks, Sohna)..."
             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-10 text-sm focus:outline-none focus:border-gold-400/50 transition-colors"
           />
           <span className="absolute left-3 top-3 text-slate-400">📍</span>
@@ -144,12 +160,6 @@ const Discover = () => {
           </button>
         </form>
 
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filter by cafe name or vibe..."
-          className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400/50 transition-colors"
-        />
         <div className="flex items-center gap-2">
           <label className="text-xs text-slate-400 whitespace-nowrap">Radius: {radius}km</label>
           <input
