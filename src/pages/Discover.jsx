@@ -112,7 +112,7 @@ const Discover = () => {
             if (!searchInput) return;
             setLocating(true);
             try {
-              // Geocode the query to find real-world location in English
+              // 1. Geocode the query to find the center location to pan to
               const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}&addressdetails=1&accept-language=en`);
               const data = await res.json();
               
@@ -129,11 +129,12 @@ const Discover = () => {
                 setMapCenter(newLoc);
                 setShowSearchArea(false);
 
-                // We do NOT set filterQuery here. We just want to fetch all cafes around the searched location!
-                // If the user wants to filter by a specific cafe name (like "Starbucks"), they can use a separate filter.
-                setFilterQuery(''); 
+                // 2. We pass the EXACT natural language query to the backend as `filterQuery`.
+                // The backend is now smart enough to use this string to fetch relevant places from OpenStreetMap
+                // and bypass strict local DB name filtering for the newly discovered places!
+                setFilterQuery(searchInput);
               } else {
-                alert('Location not found. Try another city or area.');
+                alert('Location not found. Try another city or cafe.');
               }
             } catch (err) {
               console.error(err);
@@ -145,7 +146,7 @@ const Discover = () => {
           <input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search city, area, or landmark (e.g. Sohna, Airia Mall)..."
+            placeholder="Search for cafes, restaurants, or cities (e.g. Starbucks, Sohna, Gurugram restaurants)..."
             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-10 text-sm focus:outline-none focus:border-gold-400/50 transition-colors"
           />
           <span className="absolute left-3 top-3 text-slate-400">📍</span>
@@ -153,13 +154,6 @@ const Discover = () => {
             Search
           </button>
         </form>
-
-        <input
-          value={filterQuery}
-          onChange={(e) => setFilterQuery(e.target.value)}
-          placeholder="Filter cafes by name (e.g. Starbucks)..."
-          className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400/50 transition-colors"
-        />
 
         <div className="flex items-center gap-2">
           <label className="text-xs text-slate-400 whitespace-nowrap">Radius: {radius}km</label>
