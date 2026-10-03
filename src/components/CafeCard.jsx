@@ -22,7 +22,7 @@ const CafeCard = ({ cafe, index = 0 }) => (
       <div className="relative glass h-full w-full z-0">
       <div className="relative h-44 overflow-hidden">
         <img
-          src={cafe.image}
+          src={cafe.image || 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80'}
           alt={cafe.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
           loading="lazy"
@@ -43,11 +43,17 @@ const CafeCard = ({ cafe, index = 0 }) => (
       <div className="p-5">
         <div className="flex items-start justify-between gap-2 mb-1.5">
           <h3 className="font-display font-semibold text-base leading-tight">{cafe.name}</h3>
-          <div className="flex items-center gap-1 text-xs font-semibold text-gold-400 shrink-0">
-            ★ {cafe.rating?.toFixed(1)}
+          <div className="flex flex-col items-end shrink-0">
+            {cafe.rating ? (
+              <span className="flex items-center gap-1 text-xs font-semibold text-gold-400">
+                ★ {cafe.rating.toFixed(1)} {cafe.ratingCount ? <span className="text-slate-500 font-normal">({cafe.ratingCount})</span> : ''}
+              </span>
+            ) : (
+              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">New</span>
+            )}
           </div>
         </div>
-        <p className="text-slate-400 text-sm mb-3 line-clamp-2">{cafe.description}</p>
+        <p className="text-slate-400 text-sm mb-3 line-clamp-2">{cafe.description || 'A cozy spot.'}</p>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs text-slate-400">

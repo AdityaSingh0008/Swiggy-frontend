@@ -16,11 +16,25 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    client
-      .get('/cafes?sort=rating')
-      .then(({ data }) => setFeatured(data.cafes.slice(0, 4)))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const fetchFeatured = (lat, lng) => {
+      let url = '/cafes?sort=rating';
+      if (lat && lng) url += `&lat=${lat}&lng=${lng}&radius=20`;
+      
+      client
+        .get(url)
+        .then(({ data }) => setFeatured(data.cafes.slice(0, 4)))
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => fetchFeatured(pos.coords.latitude, pos.coords.longitude),
+        () => fetchFeatured() // Fallback if denied
+      );
+    } else {
+      fetchFeatured();
+    }
   }, []);
 
   return (
