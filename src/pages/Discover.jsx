@@ -16,6 +16,7 @@ const Discover = () => {
   const [cafes, setCafes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
+  const [locationQuery, setLocationQuery] = useState('');
   const [activeTag, setActiveTag] = useState('');
   const [radius, setRadius] = useState(10);
   const [view, setView] = useState('map'); // 'map' | 'list'
@@ -104,10 +105,49 @@ const Discover = () => {
       </div>
 
       <div className="flex flex-col md:flex-row gap-3 mb-6">
+        <form 
+          className="relative flex-1"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!locationQuery) return;
+            setLocating(true);
+            try {
+              // Geocode the location using free Nominatim API
+              const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationQuery)}`);
+              const data = await res.json();
+              if (data && data.length > 0) {
+                const { lat, lon, display_name } = data[0];
+                const newLoc = { lat: Number(lat), lng: Number(lon), label: display_name.split(',')[0] };
+                setUserLocation(newLoc);
+                // Also center map immediately
+                setMapCenter(newLoc);
+                setShowSearchArea(false);
+              } else {
+                alert('Location not found. Try another city.');
+              }
+            } catch (err) {
+              console.error(err);
+            } finally {
+              setLocating(false);
+            }
+          }}
+        >
+          <input
+            value={locationQuery}
+            onChange={(e) => setLocationQuery(e.target.value)}
+            placeholder="Enter city or area (e.g. Sohna)..."
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-10 text-sm focus:outline-none focus:border-gold-400/50 transition-colors"
+          />
+          <span className="absolute left-3 top-3 text-slate-400">📍</span>
+          <button type="submit" className="absolute right-2 top-2 px-3 py-1 bg-white/10 rounded-lg text-xs font-semibold hover:bg-white/20 transition-colors">
+            Search
+          </button>
+        </form>
+
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search cafes, cuisine, vibe…"
+          placeholder="Filter by cafe name or vibe..."
           className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400/50 transition-colors"
         />
         <div className="flex items-center gap-2">

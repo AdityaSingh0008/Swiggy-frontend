@@ -50,17 +50,35 @@ const Premium = () => {
         {perks.map((perk, i) => (
           <motion.div
             key={perk.title}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.05 }}
-            className="glass rounded-2xl p-5 flex items-start gap-4"
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, delay: i * 0.1, type: "spring", stiffness: 100 }}
+            whileHover={{ scale: 1.02, y: -4, transition: { duration: 0.2 } }}
+            whileTap={{ scale: 0.98 }}
+            className="group glass rounded-2xl p-6 flex items-start gap-5 cursor-pointer relative overflow-hidden"
           >
-            <div className="text-2xl">{perk.icon}</div>
-            <div>
-              <h3 className="font-semibold mb-1">{perk.title}</h3>
-              <p className="text-slate-400 text-sm">{perk.desc}</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-gold-500/0 to-gold-500/0 group-hover:from-gold-500/5 group-hover:to-transparent transition-colors duration-500" />
+            <motion.div 
+              className="text-3xl filter drop-shadow-md relative z-10"
+              whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {perk.icon}
+            </motion.div>
+            <div className="relative z-10">
+              <h3 className="font-semibold mb-1.5 group-hover:text-gold-400 transition-colors">{perk.title}</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">{perk.desc}</p>
             </div>
+            
+            {/* Animated glowing border line on hover */}
+            <motion.div 
+              className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-gold-500 to-emerald-500 origin-left"
+              initial={{ scaleX: 0, opacity: 0 }}
+              whileHover={{ scaleX: 1, opacity: 1 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              style={{ width: '100%' }}
+            />
           </motion.div>
         ))}
       </div>
