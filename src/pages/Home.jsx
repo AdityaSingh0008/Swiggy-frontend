@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import client from '../api/client.js';
 import CafeCard from '../components/CafeCard.jsx';
 import SkeletonCard from '../components/SkeletonCard.jsx';
+import InteractivePulseCards from '../components/InteractivePulseCards.jsx';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -128,18 +129,8 @@ const Home = () => {
                 Try it on the map →
               </Link>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { icon: '🪑', label: 'Seating', desc: 'Plenty / Limited / Full' },
-                { icon: '🔊', label: 'Noise', desc: 'Quiet / Moderate / Loud' },
-                { icon: '📶', label: 'Wifi', desc: 'Fast / Okay / Slow' },
-              ].map((item) => (
-                <div key={item.label} className="glass rounded-2xl p-4 text-center">
-                  <div className="text-2xl mb-2">{item.icon}</div>
-                  <p className="font-semibold text-sm mb-1">{item.label}</p>
-                  <p className="text-[11px] text-slate-500">{item.desc}</p>
-                </div>
-              ))}
+            <div>
+              <InteractivePulseCards cafes={featured} />
             </div>
           </div>
         </div>

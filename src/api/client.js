@@ -12,4 +12,17 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('sp_token');
+      // If we are not already on login, we could redirect here, 
+      // but Context usually handles auth state better. At least clear token.
+      window.dispatchEvent(new Event('auth-expired'));
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default client;

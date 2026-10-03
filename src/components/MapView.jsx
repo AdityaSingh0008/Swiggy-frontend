@@ -42,15 +42,29 @@ const Recenter = ({ lat, lng, zoom }) => {
   return null;
 };
 
-const MapView = ({ userLocation, cafes = [], radiusKm = 5, height = '480px' }) => {
+import { useMapEvents } from 'react-leaflet';
+const MapEvents = ({ onMove }) => {
+  useMapEvents({
+    moveend: (e) => {
+      if (onMove) {
+        const center = e.target.getCenter();
+        onMove({ lat: center.lat, lng: center.lng });
+      }
+    },
+  });
+  return null;
+};
+
+const MapView = ({ userLocation, cafes = [], radiusKm = 5, height = '480px', onMapMove }) => {
   const center = userLocation ? [userLocation.lat, userLocation.lng] : [26.9124, 75.7873];
 
   return (
     <div className="rounded-2xl overflow-hidden shadow-premium border border-white/5" style={{ height }}>
       <MapContainer center={center} zoom={13} scrollWheelZoom style={{ height: '100%', width: '100%' }}>
         <TileLayer
-          attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          className="dark-map-tiles"
         />
 
         {userLocation && (
@@ -66,6 +80,8 @@ const MapView = ({ userLocation, cafes = [], radiusKm = 5, height = '480px' }) =
             />
           </>
         )}
+        
+        <MapEvents onMove={onMapMove} />
 
         {cafes.map((cafe) => (
           <Marker
@@ -79,9 +95,19 @@ const MapView = ({ userLocation, cafes = [], radiusKm = 5, height = '480px' }) =
                 <p className="text-xs opacity-70 mb-1.5">
                   ★ {cafe.rating?.toFixed(1)} {typeof cafe.distanceKm === 'number' ? `· ${cafe.distanceKm} km away` : ''}
                 </p>
-                <Link to={`/cafe/${cafe._id}`} className="text-xs font-semibold text-gold-400 hover:underline">
-                  View details →
-                </Link>
+                <div className="flex gap-3 mt-1.5">
+                  <Link to={`/cafe/${cafe._id}`} className="text-xs font-semibold text-gold-400 hover:underline">
+                    View details
+                  </Link>
+                  <a 
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${cafe.location.lat},${cafe.location.lng}`} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="text-xs font-semibold text-emerald-400 hover:underline"
+                  >
+                    Directions
+                  </a>
+                </div>
               </div>
             </Popup>
           </Marker>

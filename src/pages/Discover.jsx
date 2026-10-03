@@ -65,10 +65,25 @@ const Discover = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [mapCenter, setMapCenter] = useState(null);
+  const [showSearchArea, setShowSearchArea] = useState(false);
+
   useEffect(() => {
     fetchCafes(userLocation);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userLocation, query, activeTag, radius]);
+
+  const handleMapMove = useCallback((newCenter) => {
+    setMapCenter(newCenter);
+    setShowSearchArea(true);
+  }, []);
+
+  const handleSearchArea = () => {
+    if (mapCenter) {
+      setUserLocation({ ...mapCenter, label: 'Map location' });
+      setShowSearchArea(false);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-5 sm:px-8 py-10">
@@ -145,8 +160,24 @@ const Discover = () => {
       </div>
 
       {view === 'map' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-10">
-          <MapView userLocation={userLocation} cafes={cafes} radiusKm={radius} height="520px" />
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-10 relative">
+          {showSearchArea && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000]">
+              <button
+                onClick={handleSearchArea}
+                className="px-5 py-2.5 rounded-full bg-emerald-500 text-ink-950 font-bold shadow-lg shadow-emerald-500/20 hover:scale-105 transition-transform"
+              >
+                Search this area
+              </button>
+            </div>
+          )}
+          <MapView 
+            userLocation={userLocation} 
+            cafes={cafes} 
+            radiusKm={radius} 
+            height="520px" 
+            onMapMove={handleMapMove}
+          />
         </motion.div>
       )}
 
