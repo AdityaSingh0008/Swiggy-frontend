@@ -145,26 +145,6 @@ const Home = () => {
               </div>
             </motion.div>
 
-            <motion.div 
-              animate={{ y: [15, -15, 15], rotateZ: [-2, 2, -2] }}
-              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute bottom-10 left-0 w-64 bg-[#14151a] p-5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 z-10"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-xl">🌟</span>
-                <p className="font-semibold text-sm">Plus Member Perk</p>
-              </div>
-              <p className="text-xs text-slate-400 mb-3 leading-relaxed">Enjoy 1+1 on all handcrafted beverages every Tuesday.</p>
-              <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: '100%' }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="h-full bg-gradient-to-r from-gold-500 to-emerald-400"
-                />
-              </div>
-            </motion.div>
-
             {/* Decorative background shapes */}
             <motion.div 
               animate={{ scale: [1, 1.1, 1], rotate: 180 }}
