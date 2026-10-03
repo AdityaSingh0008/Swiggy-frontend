@@ -60,13 +60,17 @@ const MapView = ({ userLocation, cafes = [], radiusKm = 5, height = '480px', onM
 
   return (
     <div className="rounded-2xl overflow-hidden shadow-premium border border-white/5" style={{ height }}>
-      <MapContainer center={center} zoom={13} scrollWheelZoom style={{ height: '100%', width: '100%' }}>
+      <MapContainer center={center} zoom={13} scrollWheelZoom maxZoom={19} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           attribution='&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, DeLorme, NAVTEQ'
           url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+          maxNativeZoom={15}
+          maxZoom={19}
         />
         <TileLayer
           url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+          maxNativeZoom={15}
+          maxZoom={19}
         />
 
         {userLocation && (
