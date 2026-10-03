@@ -80,8 +80,8 @@ const CafeDetail = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-10">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="relative rounded-3xl overflow-hidden mb-8 h-64 sm:h-80">
-        <img src={cafe.image} alt={cafe.name} className="w-full h-full object-cover" />
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="relative rounded-3xl overflow-hidden mb-8 h-64 sm:h-80 shadow-premium">
+        <img src={cafe.image || 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1200&q=80'} alt={cafe.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/30 to-transparent" />
         <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between flex-wrap gap-3">
           <div>
@@ -108,11 +108,15 @@ const CafeDetail = () => {
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="flex items-center gap-1 font-semibold text-gold-400">★ {cafe.rating?.toFixed(1)} <span className="text-slate-500 font-normal">({cafe.ratingCount})</span></span>
+            {cafe.rating ? (
+              <span className="flex items-center gap-1 font-semibold text-gold-400">★ {cafe.rating.toFixed(1)} {cafe.ratingCount ? <span className="text-slate-500 font-normal">({cafe.ratingCount})</span> : ''}</span>
+            ) : (
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">New</span>
+            )}
             <span className="text-slate-500">·</span>
-            <span className="text-slate-300 text-sm">{'₹'.repeat(cafe.priceLevel)}</span>
+            <span className="text-slate-300 text-sm">{'₹'.repeat(cafe.priceLevel || 2)}</span>
             <span className="text-slate-500">·</span>
-            <span className="text-slate-300 text-sm">{cafe.openingHours}</span>
+            <span className="text-slate-300 text-sm">{cafe.openingHours || 'Open today'}</span>
           </div>
 
           <p className="text-slate-300 leading-relaxed">{cafe.description}</p>
