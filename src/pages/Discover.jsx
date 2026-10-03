@@ -112,8 +112,8 @@ const Discover = () => {
             if (!searchInput) return;
             setLocating(true);
             try {
-              // Geocode the query to find real-world location (city or specific place)
-              const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}&addressdetails=1`);
+              // Geocode the query to find real-world location in English
+              const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}&addressdetails=1&accept-language=en`);
               const data = await res.json();
               
               if (data && data.length > 0) {
