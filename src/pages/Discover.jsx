@@ -178,11 +178,14 @@ const Discover = () => {
             if (!searchInput) return;
             setLocating(true);
             try {
-              // 1. Geocode the query to find the center location to pan to
+              // 1. Try to geocode the query (e.g. "Sohna", "New York") to pan the map
               const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}&addressdetails=1&accept-language=en`);
               const data = await res.json();
               
               if (data && data.length > 0) {
+                // If the search result is clearly a city/state/country, pan to it.
+                // If it's a specific place (e.g. Starbucks), Nominatim might jump to a random city.
+                // But for now, we'll pan to the best match.
                 const bestMatch = data[0];
                 const newLoc = { 
                   lat: Number(bestMatch.lat), 
@@ -190,20 +193,25 @@ const Discover = () => {
                   label: bestMatch.name || bestMatch.display_name.split(',')[0] 
                 };
                 
-                // Pan map
                 setUserLocation(newLoc);
                 setMapCenter(newLoc);
                 setShowSearchArea(false);
-
-                // 2. We pass the EXACT natural language query to the backend as `filterQuery`.
-                // The backend is now smart enough to use this string to fetch relevant places from OpenStreetMap
-                // and bypass strict local DB name filtering for the newly discovered places!
-                setFilterQuery(searchInput);
-              } else {
-                alert('Location not found. Try another city or cafe.');
+              } else if (!userLocation && !mapCenter) {
+                // If they haven't located themselves and the query couldn't be geocoded
+                alert('Could not find that location. Please try searching for a city first.');
+                setLocating(false);
+                return;
               }
+
+              // 2. ALWAYS pass the natural language query to the backend as `filterQuery`.
+              // Even if Nominatim failed to geocode "best cafes", our backend Places API
+              // will use the current map coordinates to search for "best cafes" nearby!
+              setFilterQuery(searchInput);
+              setActiveTag('');
             } catch (err) {
               console.error(err);
+              // Fallback: just trigger backend search with whatever we have
+              setFilterQuery(searchInput);
             } finally {
               setLocating(false);
             }
