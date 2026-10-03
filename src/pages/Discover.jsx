@@ -129,17 +129,11 @@ const Discover = () => {
                 setMapCenter(newLoc);
                 setShowSearchArea(false);
 
-                // If they searched a specific place/cafe, use its name to filter results. 
-                // If they searched a city/area, fetch all cafes there.
-                let filterQ = '';
-                if (['amenity', 'shop', 'leisure', 'tourism'].includes(bestMatch.class)) {
-                  filterQ = bestMatch.name || bestMatch.address?.amenity || bestMatch.address?.shop || searchInput;
-                }
-                
-                // Set the active query to the parsed filter, or empty for cities
-                setFilterQuery(filterQ);
+                // We do NOT set filterQuery here. We just want to fetch all cafes around the searched location!
+                // If the user wants to filter by a specific cafe name (like "Starbucks"), they can use a separate filter.
+                setFilterQuery(''); 
               } else {
-                alert('Location not found. Try another city or cafe.');
+                alert('Location not found. Try another city or area.');
               }
             } catch (err) {
               console.error(err);
@@ -151,7 +145,7 @@ const Discover = () => {
           <input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search city, area, cafe, or restaurant (e.g. Starbucks, Sohna)..."
+            placeholder="Search city, area, or landmark (e.g. Sohna, Airia Mall)..."
             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-10 text-sm focus:outline-none focus:border-gold-400/50 transition-colors"
           />
           <span className="absolute left-3 top-3 text-slate-400">📍</span>
@@ -159,6 +153,13 @@ const Discover = () => {
             Search
           </button>
         </form>
+
+        <input
+          value={filterQuery}
+          onChange={(e) => setFilterQuery(e.target.value)}
+          placeholder="Filter cafes by name (e.g. Starbucks)..."
+          className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400/50 transition-colors"
+        />
 
         <div className="flex items-center gap-2">
           <label className="text-xs text-slate-400 whitespace-nowrap">Radius: {radius}km</label>
