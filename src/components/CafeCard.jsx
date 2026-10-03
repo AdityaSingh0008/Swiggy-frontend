@@ -16,8 +16,10 @@ const CafeCard = ({ cafe, index = 0 }) => (
   >
     <Link
       to={`/cafe/${cafe._id}`}
-      className="block glass rounded-2xl overflow-hidden shadow-premium hover:shadow-glow transition-shadow duration-300"
+      className="relative block rounded-2xl overflow-hidden shadow-premium group-hover:shadow-glow transition-all duration-300 transform-gpu"
     >
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none" />
+      <div className="relative glass h-full w-full z-0">
       <div className="relative h-44 overflow-hidden">
         <img
           src={cafe.image}
@@ -54,6 +56,7 @@ const CafeCard = ({ cafe, index = 0 }) => (
             <span>{cafe.cuisine?.slice(0, 2).join(', ')}</span>
           </div>
           <PulseBadge vibeScore={cafe.vibeScore} hasLivePulse={cafe.hasLivePulse} />
+        </div>
         </div>
       </div>
     </Link>
