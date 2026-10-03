@@ -1,8 +1,10 @@
 import axios from 'axios';
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  'https://swiggy-backend-syuv.onrender.com/api';
+let API_URL = import.meta.env.VITE_API_URL || 'https://swiggy-backend-syuv.onrender.com/api';
+
+if (API_URL && !API_URL.endsWith('/api') && !API_URL.endsWith('/api/')) {
+  API_URL = API_URL.endsWith('/') ? `${API_URL}api` : `${API_URL}/api`;
+}
 
 const client = axios.create({ baseURL: API_URL });
 
