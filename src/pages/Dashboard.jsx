@@ -11,12 +11,18 @@ const pulseSummary = (checkIn) =>
 const Dashboard = () => {
   const { user } = useAuth();
   const [checkIns, setCheckIns] = useState([]);
+  const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    client
-      .get('/checkins/mine')
-      .then(({ data }) => setCheckIns(data.checkIns))
+    Promise.all([
+      client.get('/checkins/mine'),
+      client.get('/users/me/reservations')
+    ])
+      .then(([checkinRes, resRes]) => {
+        setCheckIns(checkinRes.data.checkIns);
+        setReservations(resRes.data);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -39,6 +45,30 @@ const Dashboard = () => {
           <p className="text-slate-500 text-xs mt-1">Favorites</p>
         </motion.div>
       </div>
+
+      <h2 className="font-display text-lg font-semibold mb-4 mt-8">Active Workpass Reservations</h2>
+      
+      {loading ? (
+        <div className="space-y-3 mb-10">
+          {Array.from({ length: 1 }).map((_, i) => <div key={i} className="skeleton h-16 rounded-2xl" />)}
+        </div>
+      ) : reservations.length > 0 ? (
+        <div className="space-y-3 mb-10">
+          {reservations.map((res) => (
+            <div key={res._id} className="glass rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-gold-400/20 bg-gradient-to-r from-gold-500/5 to-transparent">
+              <div>
+                <p className="font-semibold">{res.cafe?.name || 'Unknown Cafe'}</p>
+                <p className="text-xs text-slate-400">{res.date} at {res.time} · 3 Hour Workpass</p>
+              </div>
+              <span className="text-xs font-semibold px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full capitalize">
+                {res.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-slate-500 text-sm mb-10">No upcoming reservations.</p>
+      )}
 
       <h2 className="font-display text-lg font-semibold mb-4">Recent check-ins</h2>
 

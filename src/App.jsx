@@ -15,6 +15,8 @@ import Favorites from './pages/Favorites.jsx';
 import Profile from './pages/Profile.jsx';
 import Premium from './pages/Premium.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import Feed from './pages/Feed.jsx';
+import Match from './pages/Match.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 const PageWrap = ({ children }) => (
@@ -98,6 +100,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PageWrap><Dashboard /></PageWrap>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/feed"
+              element={
+                <ProtectedRoute>
+                  <PageWrap><Feed /></PageWrap>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/match"
+              element={
+                <ProtectedRoute>
+                  <Match />
                 </ProtectedRoute>
               }
             />

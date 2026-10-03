@@ -8,6 +8,8 @@ const navLinks = [
   { to: '/discover', label: 'Discover' },
   { to: '/premium', label: 'Plus' },
   { to: '/favorites', label: 'Favorites' },
+  { to: '/match', label: 'Swipe' },
+  { to: '/feed', label: 'Social' },
   { to: '/dashboard', label: 'Dashboard' },
 ];
 

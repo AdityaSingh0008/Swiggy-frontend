@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import PulseBadge from '../components/PulseBadge.jsx';
 import PulseCheckInModal from '../components/PulseCheckInModal.jsx';
+import ReservationModal from '../components/ReservationModal.jsx';
 import MapView from '../components/MapView.jsx';
 
 const pulseFields = [
@@ -19,6 +20,7 @@ const CafeDetail = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [reserveModalOpen, setReserveModalOpen] = useState(false);
   const [favBusy, setFavBusy] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
@@ -127,16 +129,58 @@ const CafeDetail = () => {
             ))}
           </div>
 
-          {cafe.isPremiumPartner && cafe.premiumPerks?.length > 0 && (
-            <div className="glass rounded-2xl p-5 border border-gold-400/20">
-              <p className="text-sm font-semibold text-gold-400 mb-2">Plus member perks here</p>
-              <ul className="space-y-1.5">
-                {cafe.premiumPerks.map((perk) => (
-                  <li key={perk} className="text-sm text-slate-300 flex items-center gap-2">
-                    <span className="text-emerald-400">✓</span> {perk}
-                  </li>
-                ))}
-              </ul>
+          {cafe.isPremiumPartner && (
+            <div className="glass rounded-2xl p-6 border border-gold-400/20 bg-gradient-to-br from-gold-500/10 to-transparent">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-gold-400 mb-2">Plus member perks here</p>
+                  {cafe.premiumPerks?.length > 0 && (
+                    <ul className="space-y-1.5 mb-4">
+                      {cafe.premiumPerks.map((perk) => (
+                        <li key={perk} className="text-sm text-slate-300 flex items-center gap-2">
+                          <span className="text-emerald-400">✓</span> {perk}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <p className="text-sm text-slate-400">Need a guaranteed quiet space? Reserve a desk with plug points for up to 3 hours.</p>
+                </div>
+                <button 
+                  onClick={() => user ? setReserveModalOpen(true) : showToast('Log in to reserve', 'info')}
+                  className="px-5 py-2.5 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 text-ink-950 font-bold whitespace-nowrap hover:shadow-glow transition-all"
+                >
+                  Reserve a Desk
+                </button>
+              </div>
+            </div>
+          )}
+
+          {data.popularTimes && (
+            <div className="mb-8">
+              <h3 className="font-display font-semibold text-lg mb-4">Popular Times</h3>
+              <div className="glass rounded-2xl p-5 border border-white/5">
+                <div className="flex items-end gap-1.5 h-32 w-full pt-4 relative">
+                  <div className="absolute top-0 left-0 w-full border-t border-dashed border-white/10 text-[10px] text-slate-500 pt-1">Usually busy</div>
+                  <div className="absolute top-1/2 left-0 w-full border-t border-dashed border-white/10 text-[10px] text-slate-500 pt-1 -translate-y-1/2">Usually not too busy</div>
+                  
+                  {data.popularTimes.map((pt) => (
+                    <div key={pt.hour} className="flex-1 flex flex-col items-center justify-end h-full gap-2 z-10 group relative">
+                      <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-ink-950 text-xs px-2 py-1 rounded shadow-lg transition-opacity whitespace-nowrap z-20 pointer-events-none">
+                        {pt.occupancy}% busy
+                      </div>
+                      <motion.div 
+                        initial={{ height: 0 }}
+                        animate={{ height: `${pt.occupancy}%` }}
+                        transition={{ duration: 1, ease: 'easeOut', delay: (pt.hour - 8) * 0.05 }}
+                        className={`w-full rounded-t-sm transition-colors ${
+                          pt.isCurrent ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]' : 'bg-gold-400/40 group-hover:bg-gold-400'
+                        }`}
+                      />
+                      <span className="text-[10px] text-slate-400">{pt.hour % 3 === 0 ? pt.label : ''}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
@@ -229,6 +273,7 @@ const CafeDetail = () => {
       </div>
 
       <PulseCheckInModal cafeId={id} open={modalOpen} onClose={() => setModalOpen(false)} onSuccess={load} />
+      <ReservationModal isOpen={reserveModalOpen} onClose={() => setReserveModalOpen(false)} cafe={cafe} />
     </div>
   );
 };
